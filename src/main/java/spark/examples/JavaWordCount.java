@@ -10,6 +10,8 @@ import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.storage.StorageLevel;
 
+import org.apache.spark.streaming.flume.*;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
