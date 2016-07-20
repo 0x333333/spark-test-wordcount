@@ -1,4 +1,4 @@
-package org.apache.spark.examples.streaming;
+package spark.examples;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.Function;
@@ -23,34 +23,44 @@ import org.apache.spark.streaming.flume.SparkFlumeEvent;
  *     `$ bin/run-example org.apache.spark.examples.streaming.FlumePollingEventCount  <host> <port>`
  */
 public final class FlumePollingEventCount  {
-  private FlumePollingEventCount () {
-  }
+	private FlumePollingEventCount () {
+	}
 
-  public static void main(String[] args) throws Exception {
-    if (args.length != 2) {
-      System.err.println("Usage: FlumePollingEventCount  <host> <port>");
-      System.exit(1);
-    }
+	public static void main(String[] args) throws Exception {
+	if (args.length != 2) {
+		System.err.println("Usage: FlumePollingEventCount  <host> <port>");
+		System.exit(1);
+	}
 
-    //StreamingExamples.setStreamingLogLevels();
+	//StreamingExamples.setStreamingLogLevels();
 
-    String host = args[0];
-    int port = Integer.parseInt(args[1]);
+	String host = args[0];
+	int port = Integer.parseInt(args[1]);
 
-    Duration batchInterval = new Duration(2000);
-    SparkConf sparkConf = new SparkConf().setAppName("FlumePollingEventCount ");
-    JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, batchInterval);
-    JavaReceiverInputDStream<SparkFlumeEvent> flumeStream =
-      FlumeUtils.createPollingStream(ssc, host, port);
+	Duration batchInterval = new Duration(2000);
+	SparkConf sparkConf = new SparkConf().setAppName("FlumePollingEventCount ");
+	JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, batchInterval);
+	JavaReceiverInputDStream<SparkFlumeEvent> flumeStream =
+	  FlumeUtils.createPollingStream(ssc, host, port);
 
-    flumeStream.count().map(new Function<Long, String>() {
-      @Override
-      public String call(Long in) {
-        return "Received " + in + " flume events.";
-      }
-    }).print();
-  
-    ssc.start();
-    ssc.awaitTermination();
-  }
+	flumeStream.map(new Function<SparkFlumeEvent, String>() {
+		@Override
+		public String call(SparkFlumeEvent e) {
+			String ret = "ToString: " + e.toString() + "\n";
+			ret = ret + "Header: " + e.event().get(0).toString() + "\n";
+			ret = ret + "Body: " + new String(e.event().getBody().array()) + "\n";
+			return ret;
+		}
+	}).print();
+
+	flumeStream.count().map(new Function<Long, String>() {
+		@Override
+		public String call(Long in) {
+			return "Received " + in + " flume events.";
+		}
+	}).print();
+
+	ssc.start();
+	ssc.awaitTermination();
+	}
 }

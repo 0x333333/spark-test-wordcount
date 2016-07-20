@@ -1,4 +1,4 @@
-package org.apache.spark.examples;
+package spark.examples;
 
 import scala.Tuple2;
 import org.apache.spark.SparkConf;

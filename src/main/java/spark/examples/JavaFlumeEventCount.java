@@ -1,4 +1,4 @@
-package org.apache.spark.examples.streaming;
+package spark.examples;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.Function;
